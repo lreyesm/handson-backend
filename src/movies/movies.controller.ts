@@ -21,13 +21,13 @@ export class MoviesController {
     async getMovies(@Query() query: any, @Body() body: any) {
         const options = query.page ? query : body;
         const res = await this.movieService.findAll(options);
-        const answer = {
-            res: res,
-            count: res.length,
-            query: query,
-            body: body,
-        };
-        return answer;
+        // const answer = {
+        //     res: res,
+        //     count: res.length,
+        //     query: query,
+        //     body: body,
+        // };
+        return res;
     }
 
     // @Get('upload')
@@ -43,13 +43,16 @@ export class MoviesController {
     // }
 
     @Post()
-    addMovie(@Body() body: Movie) {
+    async addMovie(@Body() body: Movie) {
         const date = new Date();
         const timeString = date.toISOString();
-        return this.movieService.save({
+        const movie = await this.movieService.save({
             ...body,
             createdAt: timeString,
         });
+        // console.log('************* movie *************');
+        // console.log(movie);
+        return movie;
     }
 
     @Get(':movieId')
@@ -86,7 +89,9 @@ export class MoviesController {
         }
         const res = await this.movieService.delete(params.movieId);
         if (res.affected > 0) {
-            return movie;
+            return {
+                message: 'Movie deleted!',
+            };
         }
         return {
             message: 'Movie not deleted',
